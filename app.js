@@ -16,7 +16,7 @@ function phoneIsValid(value) {
 }
 function show(stage) {
   $('lead-form').hidden = stage !== 'basic'; $('optional-stage').hidden = stage !== 'optional'; $('summary').hidden = stage !== 'summary';
-  const titles = { basic: '30 秒，准备基础申请', optional: '再补充一点，就更清楚', summary: '需求已在本页整理' };
+  const titles = { basic: '免费车险咨询', optional: '再补充一点，就更清楚', summary: '需求已在本页整理' };
   $('form-title').textContent = titles[stage];
   $('step-label').textContent = stage === 'basic' ? '1 / 2 · 必填' : stage === 'optional' ? '2 / 2 · 选填' : '预览完成';
   $('progress').style.width = stage === 'basic' ? '50%' : '100%';
@@ -126,4 +126,20 @@ window.addEventListener('pagehide', () => clearData()); window.addEventListener(
 document.querySelectorAll('[data-purpose]').forEach(link => link.addEventListener('click', () => { purpose = link.dataset.purpose; }));
 $('privacy-link').addEventListener('click', event => { event.preventDefault(); $('privacy').showModal(); }); $('close-privacy').addEventListener('click', () => $('privacy').close());
 $('privacy').addEventListener('click', event => { if (event.target !== $('privacy')) return; const rect = $('privacy').getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) $('privacy').close(); });
-if ('IntersectionObserver' in window) new IntersectionObserver(entries => { document.querySelector('.mobile-cta').style.visibility = entries[0].isIntersecting ? 'hidden' : ''; }, { threshold: 0 }).observe($('quote'));
+
+const wechatDialog = $('wechat-dialog');
+document.querySelectorAll('[data-wechat]').forEach(button => button.addEventListener('click', () => wechatDialog.showModal()));
+$('close-wechat').addEventListener('click', () => wechatDialog.close());
+$('wechat-to-form').addEventListener('click', () => { wechatDialog.close(); document.getElementById('quote').scrollIntoView({behavior:'smooth',block:'start'}); });
+wechatDialog.addEventListener('click', event => { if(event.target !== wechatDialog) return; const r = wechatDialog.getBoundingClientRect(); if(event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) wechatDialog.close(); });
+
+$('copy-wechat').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText('minseo627');
+    $('copy-status').textContent = '已复制 minseo627，请打开微信搜索添加。';
+    $('copy-wechat').textContent = '已复制微信号 ✓';
+  } catch {
+    $('copy-status').textContent = '无法自动复制，请长按上方微信号，选择复制。';
+  }
+});
+wechatDialog.addEventListener('close', () => { $('copy-status').textContent = ''; $('copy-wechat').textContent = '复制微信号 ＋'; });
